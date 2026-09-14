@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# fotos reales de prueba, no versionar
+examples/*.jpg
+examples/*.jpeg
+examples/*.png
+!examples/.gitkeep
+
+.DS_Store
