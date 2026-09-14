@@ -1,14 +1,10 @@
-# passport-filter
+# passport-filter (Omar Hound style)
 
-Filtro de imagen determinista que convierte una foto al estilo visual de
-fotos de pasaporte ruso mal escaneadas/fotocopiadas: altísimo contraste,
-silueta casi negra con una franja de brillo en el rostro, halftone,
-ruido de escaneo y degradación por generaciones de copia.
+Deterministic image filter that transforms a photo into the visual style of poorly scanned/photocopied Russian passport photos: extremely high contrast, an almost-black silhouette with a bright band across the face, halftone, scan noise, and degradation from multiple generations of copying.
 
-No usa machine learning: es un pipeline de procesamiento de imagen tipo
-filtro de Instagram, con cada paso implementado sobre Pillow/numpy.
+It does not use machine learning: it is an image-processing pipeline similar to an Instagram filter, with each step implemented using Pillow/numpy.
 
-## Instalación
+## Installation
 
 ```bash
 python -m venv .venv
@@ -16,20 +12,20 @@ python -m venv .venv
 pip install -e ".[dev]"
 ```
 
-Para capturar desde cámara también hace falta el extra `camera`:
+To capture from a camera, the `camera` extra is also required:
 
 ```bash
 pip install -e ".[camera]"
 ```
 
-## Uso
+## Usage
 
 ```bash
 passport-filter --input foto.jpg --output resultado.jpg
 passport-filter --camera --output resultado.jpg
 ```
 
-Para superponer el patrón decorativo (paso opcional):
+To overlay the decorative pattern (optional step):
 
 ```bash
 passport-filter --input foto.jpg --output resultado.jpg --pattern assets/patterns/guilloche.png
@@ -37,12 +33,12 @@ passport-filter --input foto.jpg --output resultado.jpg --pattern assets/pattern
 
 ## Pipeline
 
-1. Escala de grises
-2. Curva de contraste sigmoide (`midpoint` fijo o calculado del histograma)
-3. Dithering ordenado (Bayer 4x4)
-4. Overlay opcional de un patrón decorativo (blend screen/multiply/overlay)
-5. Ruido gaussiano (grano de escaneo)
-6. Degradación por generaciones (downscale/upscale + recompresión JPEG en loop)
+1. Grayscale conversion
+2. Sigmoid contrast curve (`midpoint` fixed or calculated from the histogram)
+3. Ordered dithering (4x4 Bayer)
+4. Optional decorative pattern overlay (screen/multiply/overlay blend)
+5. Gaussian noise (scan grain)
+6. Generational degradation (downscale/upscale + JPEG recompression in a loop)
 7. Blur + unsharp mask
 
 ## Tests
