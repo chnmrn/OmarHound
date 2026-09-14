@@ -130,6 +130,28 @@ hosting, todo corre local (`server.py` levanta Flask en un thread en
   `/api/process`, llama a `detect_face_box` una vez más solo para el
   mensaje — sí, corre la detección dos veces en ese caso, aceptable
   porque es un click de botón, no un stream por frame)
+- Interfaz traducida a inglés (por el usuario, directo en el HTML) y
+  luego rediseñada con paleta "expediente clasificado" (papel crema,
+  tinta oscura, acento rojo sello, monoespaciada, marcas de esquina en
+  las esquinas de los paneles, headers numerados 01/02/03/04 tipo
+  campo de formulario) — inspirado en una referencia visual del
+  usuario, pero sin copiar nombres/logo de la marca de la que viene esa
+  referencia (era el estilo de documentos in-game de un videojuego).
+  Tarjetas de patrones ahora son miniatura + etiqueta con nombre (antes
+  solo la imagen pelada con tooltip), con íconos SVG inline en todos
+  los botones (subir, cámara, capturar, generar, guardar) — sin
+  dependencias externas ni CDN, todo dibujado a mano en el HTML/JS para
+  que la app funcione 100% offline
+- Bug encontrado durante la revisión visual: `.preview { display: block }`
+  le ganaba al atributo `hidden` de los `<img>` de origen/resultado, así
+  que se veían íconos de "imagen rota" antes de subir/generar algo
+  (bug preexistente al rediseño, no introducido por él). Fix: regla
+  global `[hidden] { display: none !important; }` al tope de
+  `style.css`
+- De paso se tradujeron al inglés los strings que habían quedado en
+  español en `app.js` y `server.py` (mensajes de error, confirmación de
+  borrado, `face_message`), para consistencia con el resto de la UI ya
+  traducida
 
 Probado con Flask test client (`tests/test_gui.py`, sin servidor/ventana
 real) y con una corrida real de la ventana en este entorno — cargó la

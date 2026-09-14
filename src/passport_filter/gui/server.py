@@ -48,9 +48,9 @@ def create_app() -> Flask:
     def delete_pattern():
         path = Path(request.args["path"]).resolve()
         if USER_PATTERNS_DIR not in path.parents:
-            return jsonify({"error": "Solo se pueden borrar patrones propios, no los del proyecto"}), 400
+            return jsonify({"error": "Only your own patterns can be deleted, not the built-in ones"}), 400
         if not path.exists():
-            return jsonify({"error": "Ese patrón ya no existe"}), 404
+            return jsonify({"error": "That pattern no longer exists"}), 404
 
         path.unlink()
         return jsonify({"ok": True})
@@ -61,8 +61,8 @@ def create_app() -> Flask:
 
         try:
             image = capture_frame()
-        except RuntimeError as exc:
-            return jsonify({"error": str(exc)}), 400
+        except RuntimeError:
+            return jsonify({"error": "Could not access the camera"}), 400
 
         return jsonify({"image": _image_to_data_url(image)})
 
@@ -74,7 +74,7 @@ def create_app() -> Flask:
         elif "photo" in request.files:
             image = Image.open(request.files["photo"].stream)
         else:
-            return jsonify({"error": "No se recibió ninguna foto"}), 400
+            return jsonify({"error": "No photo was received"}), 400
 
         pattern_path = request.form.get("pattern_path") or None
         blend_mode = request.form.get("blend_mode", "multiply")
@@ -87,9 +87,9 @@ def create_app() -> Flask:
             from passport_filter.steps.face import detect_face_box
 
             if detect_face_box(image) is not None:
-                face_message = "Cara detectada: el patrón se centró sobre ella."
+                face_message = "Face detected: the pattern was centered on it."
             else:
-                face_message = "No se detectó ninguna cara; el patrón se aplicó sobre toda la foto."
+                face_message = "No face was detected; the pattern was applied over the whole photo."
 
         result = run_pipeline(
             image,

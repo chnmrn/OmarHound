@@ -42,55 +42,68 @@ async function loadPatterns() {
   renderPatternGrid(patterns);
 }
 
+const NONE_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M6.5 6.5l11 11"/></svg>`;
+
 function renderPatternGrid(patterns) {
   const grid = el("pattern-grid");
   grid.innerHTML = "";
 
-  const noneTile = document.createElement("div");
-  noneTile.className = "pattern-tile";
-  noneTile.textContent = "Ninguno";
-  noneTile.addEventListener("click", () => selectPattern(null, noneTile));
-  grid.appendChild(noneTile);
-  if (state.selectedPatternPath === null) {
-    noneTile.classList.add("selected");
-  }
+  const noneCard = buildPatternCard({ name: "None", path: null, source: "builtin" });
+  grid.appendChild(noneCard);
 
   for (const pattern of patterns) {
-    const tile = document.createElement("div");
-    tile.className = "pattern-tile";
-    if (pattern.path === state.selectedPatternPath) {
-      tile.classList.add("selected");
-    }
-    tile.style.backgroundImage = `url(/api/patterns/thumbnail?path=${encodeURIComponent(pattern.path)})`;
-    tile.title = pattern.name;
-    tile.addEventListener("click", () => selectPattern(pattern.path, tile));
-
-    if (pattern.source === "custom") {
-      const deleteBtn = document.createElement("button");
-      deleteBtn.type = "button";
-      deleteBtn.className = "pattern-delete-btn";
-      deleteBtn.textContent = "×";
-      deleteBtn.title = "Borrar este patrón";
-      deleteBtn.addEventListener("click", (event) => {
-        event.stopPropagation();
-        deletePattern(pattern.path);
-      });
-      tile.appendChild(deleteBtn);
-    }
-
-    grid.appendChild(tile);
+    grid.appendChild(buildPatternCard(pattern));
   }
 }
 
+function buildPatternCard(pattern) {
+  const card = document.createElement("div");
+  card.className = "pattern-card";
+  if (pattern.path === state.selectedPatternPath) {
+    card.classList.add("selected");
+  }
+  card.addEventListener("click", () => selectPattern(pattern.path, card));
+
+  const thumb = document.createElement("div");
+  thumb.className = "pattern-thumb";
+  if (pattern.path) {
+    thumb.style.backgroundImage = `url(/api/patterns/thumbnail?path=${encodeURIComponent(pattern.path)})`;
+  } else {
+    thumb.innerHTML = NONE_ICON;
+  }
+
+  if (pattern.source === "custom") {
+    const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.className = "pattern-delete-btn";
+    deleteBtn.textContent = "×";
+    deleteBtn.title = "Delete this pattern";
+    deleteBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      deletePattern(pattern.path);
+    });
+    thumb.appendChild(deleteBtn);
+  }
+
+  const label = document.createElement("div");
+  label.className = "pattern-label";
+  label.textContent = pattern.name;
+  label.title = pattern.name;
+
+  card.appendChild(thumb);
+  card.appendChild(label);
+  return card;
+}
+
 async function deletePattern(path) {
-  if (!confirm("¿Borrar este patrón? No se puede deshacer.")) {
+  if (!confirm("Delete this pattern? This cannot be undone.")) {
     return;
   }
 
   const response = await fetch(`/api/patterns?path=${encodeURIComponent(path)}`, { method: "DELETE" });
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
-    showError(data.error || "No se pudo borrar el patrón");
+    showError(data.error || "Could not delete the pattern");
     return;
   }
 
@@ -101,10 +114,10 @@ async function deletePattern(path) {
   await loadPatterns();
 }
 
-function selectPattern(path, tileEl) {
+function selectPattern(path, cardEl) {
   state.selectedPatternPath = path;
-  document.querySelectorAll(".pattern-tile").forEach((tile) => tile.classList.remove("selected"));
-  tileEl.classList.add("selected");
+  document.querySelectorAll(".pattern-card").forEach((card) => card.classList.remove("selected"));
+  cardEl.classList.add("selected");
 
   el("placement-choice").hidden = path === null;
   el("face-message").hidden = true;
@@ -115,7 +128,7 @@ async function uploadPattern(file) {
   formData.append("file", file);
   const response = await fetch("/api/patterns/upload", { method: "POST", body: formData });
   if (!response.ok) {
-    showError("No se pudo subir el patrón");
+    showError("Could not upload the pattern");
     return;
   }
   await loadPatterns();
@@ -178,7 +191,7 @@ async function captureFromBackendCamera() {
     const response = await fetch("/api/camera/capture", { method: "POST" });
     const data = await response.json();
     if (!response.ok) {
-      showError(data.error || "No se pudo acceder a la cámara");
+      showError(data.error || "Could not access the camera");
       return;
     }
     setSourcePreview(data.image);
@@ -211,7 +224,7 @@ async function processImage() {
     });
     const data = await response.json();
     if (!response.ok) {
-      showError(data.error || "Ocurrió un error al procesar la imagen");
+      showError(data.error || "An error occurred while processing the image");
       return;
     }
     state.resultDataUrl = data.image;
@@ -225,7 +238,7 @@ async function processImage() {
       msg.hidden = false;
     }
   } catch (err) {
-    showError("Ocurrió un error al procesar la imagen");
+    showError("An error occurred while processing the image");
   } finally {
     el("spinner").hidden = true;
     el("process-btn").disabled = false;
@@ -236,7 +249,7 @@ async function saveResult() {
   if (!state.resultDataUrl || !window.pywebview) {
     return;
   }
-  await window.pywebview.api.save_image(state.resultDataUrl, "resultado.jpg");
+  await window.pywebview.api.save_image(state.resultDataUrl, "result.jpg");
 }
 
 function init() {

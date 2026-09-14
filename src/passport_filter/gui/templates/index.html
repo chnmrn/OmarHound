@@ -1,97 +1,117 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>passport-filter</title>
+  <title>Omar Hound Simulator</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
   <header>
-    <h1>passport-filter</h1>
-    <p class="subtitle">Filtro estilo pasaporte ruso mal fotocopiado</p>
+    <div>
+      <h1>passport-filter (Omar Hound Style)</h1>
+      <p class="subtitle">Badly photocopied Russian passport-style filter</p>
+    </div>
   </header>
 
   <main>
     <section class="panel">
       <div class="step">
-        <h2>1. Foto</h2>
+        <h2 data-step="01">Photo</h2>
         <div class="row">
-          <button id="pick-file-btn" type="button">Subir foto</button>
-          <button id="use-camera-btn" type="button">Usar cámara</button>
+          <button id="pick-file-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V4M8 8l4-4 4 4M5 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3"/></svg>
+            Upload an image
+          </button>
+          <button id="use-camera-btn" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.2"/></svg>
+            Use camera
+          </button>
           <input id="file-input" type="file" accept="image/*" hidden />
         </div>
 
         <div id="camera-live" class="camera-live" hidden>
           <video id="camera-video" autoplay playsinline muted></video>
           <div class="row">
-            <button id="capture-btn" type="button" class="primary">Capturar foto</button>
-            <button id="cancel-camera-btn" type="button">Cancelar</button>
+            <button id="capture-btn" type="button" class="primary">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/></svg>
+              Take picture
+            </button>
+            <button id="cancel-camera-btn" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              Cancel
+            </button>
           </div>
         </div>
         <canvas id="capture-canvas" hidden></canvas>
 
-        <img id="source-preview" class="preview" hidden alt="Foto de origen" />
-        <p id="source-empty" class="empty-hint">Todavía no elegiste ninguna foto</p>
+        <img id="source-preview" class="preview" hidden alt="Source photo" />
+        <p id="source-empty" class="empty-hint">You haven't selected a photo yet</p>
       </div>
 
       <div class="step">
-        <h2>2. Patrón (opcional)</h2>
+        <h2 data-step="02">Pattern (optional)</h2>
         <div id="pattern-grid" class="pattern-grid"></div>
-        <button id="upload-pattern-btn" type="button" class="link-btn">+ Subir mi propio patrón</button>
+        <button id="upload-pattern-btn" type="button" class="link-btn">+ New pattern/symbol</button>
         <input id="pattern-file-input" type="file" accept="image/png,image/jpeg" hidden />
 
         <div id="placement-choice" class="placement-choice" hidden>
-          <span class="placement-label">¿Dónde va el patrón?</span>
+          <span class="placement-label">Pattern placement</span>
           <label class="radio-field">
             <input type="radio" name="placement" value="background" checked />
-            Sobre toda la foto (fondo)
+            Use as a background
           </label>
           <label class="radio-field">
             <input type="radio" name="placement" value="face" />
-            Centrado en la cara detectada
+            Center on detected face
           </label>
           <p id="face-message" class="empty-hint" hidden></p>
         </div>
       </div>
 
       <div class="step">
-        <h2>3. Ajustes</h2>
+        <h2 data-step="03">Settings</h2>
         <label class="field">
           Blend mode
           <select id="blend-mode">
-            <option value="multiply">multiply (sutil)</option>
-            <option value="screen">screen (marcado)</option>
+            <option value="multiply">multiply (subtle)</option>
+            <option value="screen">screen (bold)</option>
             <option value="overlay">overlay</option>
           </select>
         </label>
         <label class="field">
-          Opacidad del patrón: <span id="opacity-value">0.30</span>
+          Pattern opacity: <span id="opacity-value">0.30</span>
           <input id="opacity" type="range" min="0" max="1" step="0.05" value="0.3" />
         </label>
         <details class="advanced">
-          <summary>Avanzado</summary>
+          <summary>Advanced</summary>
           <label class="checkbox-field">
             <input id="midpoint-auto" type="checkbox" checked />
-            Midpoint automático (histograma)
+            Automatic midpoint
           </label>
           <label class="field">
-            Midpoint manual
+            Manual midpoint
             <input id="midpoint-manual" type="range" min="0.4" max="0.9" step="0.01" value="0.65" disabled />
           </label>
         </details>
       </div>
 
-      <button id="process-btn" type="button" class="primary" disabled>Procesar</button>
+      <button id="process-btn" type="button" class="primary" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="15" width="14" height="4" rx="0.5"/><path d="M9 15V9a3 3 0 0 1 6 0v6"/></svg>
+        Generate
+      </button>
     </section>
 
     <section class="panel result-panel">
-      <h2>Resultado</h2>
+      <h2 data-step="04">Result</h2>
       <div id="result-area" class="result-area">
-        <p id="result-empty" class="empty-hint">El resultado va a aparecer acá</p>
+        <p id="result-empty" class="empty-hint">Result goes here</p>
         <div id="spinner" class="spinner" hidden></div>
-        <img id="result-preview" class="preview" hidden alt="Resultado" />
+        <img id="result-preview" class="preview" hidden alt="Result" />
       </div>
-      <button id="save-btn" type="button" class="primary" disabled>Guardar imagen</button>
+      <button id="save-btn" type="button" class="primary" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h8V4M8 14h8v6H8z"/></svg>
+        Save image
+      </button>
       <p id="error-message" class="error" hidden></p>
     </section>
   </main>
