@@ -43,8 +43,10 @@ con cada paso del pipeline como módulo independiente en `steps/` y tests en
    en loop, simula fotocopia de una fotocopia — `steps/degradation.py` ✅
 7. Blur + unsharp mask (efecto de tinta "corrida") — `steps/sharpen.py` ✅
 
-CLI (`passport-filter` / `python -m passport_filter`) soporta `--input <ruta>`
-o `--camera` (requiere el extra `opencv-python`, `pip install -e ".[camera]"`).
+CLI (`passport-filter` / `python -m passport_filter`) soporta `--input <ruta>`,
+`--camera` (una sola foto) o `--live` (ventana OpenCV en loop, efecto aplicado
+en tiempo real, ESC para salir — `live.py`). Los tres requieren el extra
+`opencv-python` salvo `--input`, `pip install -e ".[camera]"`.
 `camera.py` usa `cv2.VideoCapture(0, cv2.CAP_DSHOW)` — el backend por defecto
 de OpenCV en Windows (MSMF) suele fallar o colgarse para abrir la cámara.
 
@@ -54,7 +56,9 @@ probar con fotos reales.
 
 ## Pendiente / lo que se quiere explorar ahora
 - Probar el pipeline completo con fotos reales, no solo sintéticas
-- Modo de vista en vivo con la cámara (loop de video, no solo una foto)
 - Posible port a JavaScript para una demo web
+- El modo `--live` corre el pipeline completo (incluida la degradación
+  JPEG en loop) por frame; si se ve lento en cámara real, considerar un
+  pipeline "ligero" para preview (menos generaciones de degradación)
 - Antes de subir a GitHub: completar el nombre real en `LICENSE` (hoy
   tiene el placeholder `[TU NOMBRE]`)

@@ -14,7 +14,12 @@ def build_parser() -> argparse.ArgumentParser:
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--input", type=Path, help="Ruta a la imagen de entrada")
     source.add_argument("--camera", action="store_true", help="Captura desde la cámara")
-    parser.add_argument("--output", type=Path, default=Path("output.jpg"), help="Ruta de salida")
+    source.add_argument(
+        "--live",
+        action="store_true",
+        help="Vista en vivo desde la cámara con el efecto aplicado en tiempo real (ventana OpenCV, ESC para salir)",
+    )
+    parser.add_argument("--output", type=Path, default=Path("output.jpg"), help="Ruta de salida (ignorado con --live)")
     parser.add_argument(
         "--midpoint",
         type=float,
@@ -28,6 +33,12 @@ def build_parser() -> argparse.ArgumentParser:
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
+
+    if args.live:
+        from passport_filter.live import run_live_preview
+
+        run_live_preview(midpoint=args.midpoint, pattern_path=args.pattern)
+        return
 
     if args.camera:
         from passport_filter.camera import capture_frame

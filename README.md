@@ -27,6 +27,7 @@ pip install -e ".[camera]"
 ```bash
 passport-filter --input foto.jpg --output resultado.jpg
 passport-filter --camera --output resultado.jpg
+passport-filter --live
 ```
 
 Para superponer el patrón decorativo (paso opcional):
