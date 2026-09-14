@@ -32,6 +32,20 @@ To overlay the decorative pattern (optional step):
 passport-filter --input foto.jpg --output resultado.jpg --pattern assets/patterns/guilloche.png
 ```
 
+There are also two generic "stamp" patterns (a crosshair seal and a fingerprint-like
+texture, both procedurally generated — not real official symbols) that read better
+with a stronger blend:
+
+```bash
+passport-filter --input foto.jpg --output resultado.jpg --pattern assets/patterns/stamp_crosshair.png --blend-mode screen --opacity 0.7
+```
+
+To auto-detect the face and center the pattern on it instead of stretching it across the whole photo, add `--center-on-face` (falls back to the static/stretched mode if no face is found):
+
+```bash
+passport-filter --input foto.jpg --output resultado.jpg --pattern assets/patterns/stamp_crosshair.png --blend-mode screen --opacity 0.7 --center-on-face
+```
+
 ## Pipeline
 
 1. Grayscale conversion

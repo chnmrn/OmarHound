@@ -32,12 +32,35 @@ con cada paso del pipeline como módulo independiente en `steps/` y tests en
    manualmente con `--midpoint`
 3. Dithering ordenado (matriz de Bayer 4x4) — `steps/dithering.py` ✅
 4. Overlay opcional de un patrón/textura con blend modes
-   (screen/multiply/overlay) — `steps/overlay.py` ✅. El asset es un
-   patrón guilloché genérico generado por código (interferencia de
-   senoidales, `scripts/generate_pattern.py` →
-   `assets/patterns/guilloche.png`), no una reproducción de un
-   documento real. Se activa solo si se pasa `--pattern <ruta>`; sin
-   ese flag el paso se salta (sigue siendo opcional)
+   (screen/multiply/overlay, `--blend-mode`) y opacidad configurable
+   (`--opacity`, default 0.3) — `steps/overlay.py` ✅. Se activa solo si
+   se pasa `--pattern <ruta>`; sin ese flag el paso se salta (sigue
+   siendo opcional). Assets disponibles, todos generados por código
+   (nada descargado ni copiado de un documento real):
+   - `assets/patterns/guilloche.png` — patrón de fondo sutil
+     (interferencia de senoidales, `scripts/generate_pattern.py`).
+     Pensado para `--blend-mode multiply` con opacidad baja (default)
+   - `assets/patterns/stamp_crosshair.png` y `stamp_fingerprint.png` —
+     "sellos" más marcados tipo el de las fotos de referencia del
+     usuario, pero con símbolos genéricos (cruz/mira, huella) en vez
+     del escudo real de Rusia o campos reales de pasaporte — decisión
+     deliberada para no construir algo que funcione como plantilla de
+     documento falso (`scripts/generate_stamp.py`). Se ven mejor con
+     `--blend-mode screen --opacity 0.6-0.8` (resalta el patrón sobre
+     las zonas oscuras de la silueta, no solo las claras)
+
+   `--center-on-face` (opcional, no reemplaza el modo estático) detecta
+   la cara con Haar cascade (`steps/face.py`, clasificador clásico
+   incluido en OpenCV, no una red neuronal) y centra `--pattern` sobre
+   la caja de la cara expandida un 40% (`expand_box`) en vez de
+   estirarlo a toda la imagen. `overlay_pattern` acepta un `region`
+   opcional para esto — fuera de esa región la imagen queda intacta
+   (el valor "neutro" del blend mode se usa como relleno). Si no se
+   detecta cara, cae de vuelta al modo estático automáticamente.
+   **IMPORTANTE**: `opencv-python` está fijado a `<5` en `pyproject.toml`
+   — la versión 5.0 sacó `cv2.CascadeClassifier` de los bindings de
+   Python (lo reemplazaron por un detector DNN que requiere descargar
+   un modelo `.onnx`, lo cual no queríamos)
 5. Ruido gaussiano (grano de escaneo) — `steps/noise.py` ✅
 6. Degradación por generaciones: downscale/upscale + recompresión JPEG
    en loop, simula fotocopia de una fotocopia — `steps/degradation.py` ✅
@@ -56,9 +79,11 @@ probar con fotos reales.
 
 ## Pendiente / lo que se quiere explorar ahora
 - Probar el pipeline completo con fotos reales, no solo sintéticas
+  (`detect_face_box` tampoco se probó con una cara real todavía — solo
+  con la imagen sintética, donde correctamente no detecta nada)
 - Posible port a JavaScript para una demo web
 - El modo `--live` corre el pipeline completo (incluida la degradación
-  JPEG en loop) por frame; si se ve lento en cámara real, considerar un
-  pipeline "ligero" para preview (menos generaciones de degradación)
-- Antes de subir a GitHub: completar el nombre real en `LICENSE` (hoy
-  tiene el placeholder `[TU NOMBRE]`)
+  JPEG en loop, y ahora potencialmente detección de cara) por frame; si
+  se ve lento en cámara real, considerar un pipeline "ligero" para
+  preview (menos generaciones de degradación, o no correr detección de
+  cara en cada frame sino cada N frames)

@@ -34,3 +34,14 @@ def test_overlay_pattern_multiply_darkens_image(synthetic_face, checkerboard_pat
 def test_overlay_pattern_rejects_unknown_mode(synthetic_face, checkerboard_pattern):
     with pytest.raises(ValueError):
         overlay_pattern(synthetic_face, checkerboard_pattern, mode="invalid", opacity=0.5)
+
+
+def test_overlay_pattern_region_leaves_rest_of_image_untouched(synthetic_face, checkerboard_pattern):
+    region = (0, 0, 32, 32)
+    result = overlay_pattern(
+        synthetic_face, checkerboard_pattern, mode="multiply", opacity=1.0, region=region
+    )
+    original = np.asarray(synthetic_face.convert("L"), dtype=np.int16)
+    blended = np.asarray(result, dtype=np.int16)
+
+    assert np.array_equal(original[200:, 200:], blended[200:, 200:])

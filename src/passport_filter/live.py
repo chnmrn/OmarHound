@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 
 from passport_filter.pipeline import run_pipeline
+from passport_filter.steps.overlay import BlendMode
 
 WINDOW_TITLE = "passport-filter (en vivo) - ESC para salir"
 
@@ -11,6 +12,9 @@ WINDOW_TITLE = "passport-filter (en vivo) - ESC para salir"
 def run_live_preview(
     midpoint: float | None = None,
     pattern_path: Path | None = None,
+    blend_mode: BlendMode = "multiply",
+    opacity: float = 0.3,
+    center_pattern_on_face: bool = False,
     process_width: int = 480,
     display_width: int = 900,
 ) -> None:
@@ -41,7 +45,14 @@ def run_live_preview(
                 ratio = process_width / image.width
                 image = image.resize((process_width, round(image.height * ratio)))
 
-            result = run_pipeline(image, midpoint=midpoint, pattern_path=pattern_path)
+            result = run_pipeline(
+                image,
+                midpoint=midpoint,
+                pattern_path=pattern_path,
+                blend_mode=blend_mode,
+                opacity=opacity,
+                center_pattern_on_face=center_pattern_on_face,
+            )
             result_bgr = cv2.cvtColor(np.array(result.convert("RGB")), cv2.COLOR_RGB2BGR)
 
             # la ventana es resizable (WINDOW_NORMAL) y OpenCV estira el frame

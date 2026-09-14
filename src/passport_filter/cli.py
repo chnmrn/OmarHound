@@ -27,6 +27,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="Midpoint fijo de la curva de contraste (0.6-0.75). Si se omite, se calcula del histograma",
     )
     parser.add_argument("--pattern", type=Path, default=None, help="Ruta al patrón decorativo a superponer")
+    parser.add_argument(
+        "--blend-mode",
+        choices=["multiply", "screen", "overlay"],
+        default="multiply",
+        help="Cómo se mezcla --pattern con la foto (default: multiply, sutil; screen resalta el patrón sobre las zonas oscuras, mejor para un sello marcado)",
+    )
+    parser.add_argument("--opacity", type=float, default=0.3, help="Intensidad de --pattern, de 0 a 1 (default: 0.3)")
+    parser.add_argument(
+        "--center-on-face",
+        action="store_true",
+        help="Detecta la cara y centra --pattern sobre ella en vez de estirarlo a toda la imagen. "
+        "Si no se detecta ninguna cara, cae de vuelta al modo estático",
+    )
     return parser
 
 
@@ -37,7 +50,13 @@ def main() -> None:
     if args.live:
         from passport_filter.live import run_live_preview
 
-        run_live_preview(midpoint=args.midpoint, pattern_path=args.pattern)
+        run_live_preview(
+            midpoint=args.midpoint,
+            pattern_path=args.pattern,
+            blend_mode=args.blend_mode,
+            opacity=args.opacity,
+            center_pattern_on_face=args.center_on_face,
+        )
         return
 
     if args.camera:
@@ -47,7 +66,14 @@ def main() -> None:
     else:
         image = Image.open(args.input)
 
-    result = run_pipeline(image, midpoint=args.midpoint, pattern_path=args.pattern)
+    result = run_pipeline(
+        image,
+        midpoint=args.midpoint,
+        pattern_path=args.pattern,
+        blend_mode=args.blend_mode,
+        opacity=args.opacity,
+        center_pattern_on_face=args.center_on_face,
+    )
     result.save(args.output)
 
 
