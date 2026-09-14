@@ -37,7 +37,9 @@ def generate_fingerprint_texture(size: int = 512, rings: int = 40) -> Image.Imag
 
 
 if __name__ == "__main__":
-    patterns_dir = Path(__file__).resolve().parent.parent / "assets" / "patterns"
+    patterns_dir = (
+        Path(__file__).resolve().parent.parent / "src" / "passport_filter" / "assets" / "patterns"
+    )
     generate_crosshair_seal().save(patterns_dir / "stamp_crosshair.png")
     generate_fingerprint_texture().save(patterns_dir / "stamp_fingerprint.png")
     print(f"Guardados en {patterns_dir}")

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>passport-filter</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header>
+    <h1>passport-filter</h1>
+    <p class="subtitle">Filtro estilo pasaporte ruso mal fotocopiado</p>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="step">
+        <h2>1. Foto</h2>
+        <div class="row">
+          <button id="pick-file-btn" type="button">Subir foto</button>
+          <button id="use-camera-btn" type="button">Usar cámara</button>
+          <input id="file-input" type="file" accept="image/*" hidden />
+        </div>
+
+        <div id="camera-live" class="camera-live" hidden>
+          <video id="camera-video" autoplay playsinline muted></video>
+          <div class="row">
+            <button id="capture-btn" type="button" class="primary">Capturar foto</button>
+            <button id="cancel-camera-btn" type="button">Cancelar</button>
+          </div>
+        </div>
+        <canvas id="capture-canvas" hidden></canvas>
+
+        <img id="source-preview" class="preview" hidden alt="Foto de origen" />
+        <p id="source-empty" class="empty-hint">Todavía no elegiste ninguna foto</p>
+      </div>
+
+      <div class="step">
+        <h2>2. Patrón (opcional)</h2>
+        <div id="pattern-grid" class="pattern-grid"></div>
+        <button id="upload-pattern-btn" type="button" class="link-btn">+ Subir mi propio patrón</button>
+        <input id="pattern-file-input" type="file" accept="image/png,image/jpeg" hidden />
+
+        <div id="placement-choice" class="placement-choice" hidden>
+          <span class="placement-label">¿Dónde va el patrón?</span>
+          <label class="radio-field">
+            <input type="radio" name="placement" value="background" checked />
+            Sobre toda la foto (fondo)
+          </label>
+          <label class="radio-field">
+            <input type="radio" name="placement" value="face" />
+            Centrado en la cara detectada
+          </label>
+          <p id="face-message" class="empty-hint" hidden></p>
+        </div>
+      </div>
+
+      <div class="step">
+        <h2>3. Ajustes</h2>
+        <label class="field">
+          Blend mode
+          <select id="blend-mode">
+            <option value="multiply">multiply (sutil)</option>
+            <option value="screen">screen (marcado)</option>
+            <option value="overlay">overlay</option>
+          </select>
+        </label>
+        <label class="field">
+          Opacidad del patrón: <span id="opacity-value">0.30</span>
+          <input id="opacity" type="range" min="0" max="1" step="0.05" value="0.3" />
+        </label>
+        <details class="advanced">
+          <summary>Avanzado</summary>
+          <label class="checkbox-field">
+            <input id="midpoint-auto" type="checkbox" checked />
+            Midpoint automático (histograma)
+          </label>
+          <label class="field">
+            Midpoint manual
+            <input id="midpoint-manual" type="range" min="0.4" max="0.9" step="0.01" value="0.65" disabled />
+          </label>
+        </details>
+      </div>
+
+      <button id="process-btn" type="button" class="primary" disabled>Procesar</button>
+    </section>
+
+    <section class="panel result-panel">
+      <h2>Resultado</h2>
+      <div id="result-area" class="result-area">
+        <p id="result-empty" class="empty-hint">El resultado va a aparecer acá</p>
+        <div id="spinner" class="spinner" hidden></div>
+        <img id="result-preview" class="preview" hidden alt="Resultado" />
+      </div>
+      <button id="save-btn" type="button" class="primary" disabled>Guardar imagen</button>
+      <p id="error-message" class="error" hidden></p>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

@@ -16,10 +16,15 @@ dependencies = [
 
 [project.optional-dependencies]
 camera = ["opencv-python>=4.8,<5"]
+gui = ["flask>=3.0", "pywebview>=5.0"]
 dev = ["pytest>=8.0"]
 
 [project.scripts]
 passport-filter = "passport_filter.cli:main"
+passport-filter-gui = "passport_filter.gui.app:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+passport_filter = ["assets/patterns/*.png", "gui/templates/*.html", "gui/static/*"]

@@ -18,6 +18,8 @@ def generate_guilloche_pattern(size: tuple[int, int] = (512, 512)) -> Image.Imag
 
 
 if __name__ == "__main__":
-    output_path = Path(__file__).resolve().parent.parent / "assets" / "patterns" / "guilloche.png"
+    output_path = (
+        Path(__file__).resolve().parent.parent / "src" / "passport_filter" / "assets" / "patterns" / "guilloche.png"
+    )
     generate_guilloche_pattern().save(output_path)
     print(f"Guardado en {output_path}")
