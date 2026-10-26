@@ -1,15 +1,19 @@
 import base64
 import io
 from pathlib import Path
+from typing import cast, get_args
 
 from flask import Flask, jsonify, render_template, request, send_file
 from PIL import Image
 
 from passport_filter.assets_dir import PATTERNS_DIR
 from passport_filter.pipeline import run_pipeline
+from passport_filter.steps.overlay import BlendMode
 
 USER_PATTERNS_DIR = Path.home() / ".passport_filter" / "patterns"
 PATTERN_EXTENSIONS = ("*.png", "*.jpg", "*.jpeg")
+
+MAX_FORM_MEMORY_SIZE = 100 * 1024 * 1024
 
 
 def _list_pattern_files(directory: Path) -> list[Path]:
@@ -19,6 +23,7 @@ def _list_pattern_files(directory: Path) -> list[Path]:
 def create_app() -> Flask:
     USER_PATTERNS_DIR.mkdir(parents=True, exist_ok=True)
     app = Flask(__name__)
+    app.config["MAX_FORM_MEMORY_SIZE"] = MAX_FORM_MEMORY_SIZE
 
     @app.get("/")
     def index():
@@ -40,6 +45,9 @@ def create_app() -> Flask:
     @app.post("/api/patterns/upload")
     def upload_pattern():
         file = request.files["file"]
+        if not file.filename:
+            return jsonify({"error": "The uploaded file has no name"}), 400
+
         destination = USER_PATTERNS_DIR / Path(file.filename).name
         file.save(destination)
         return jsonify({"name": destination.stem, "path": str(destination), "source": "custom"})
@@ -78,6 +86,9 @@ def create_app() -> Flask:
 
         pattern_path = request.form.get("pattern_path") or None
         blend_mode = request.form.get("blend_mode", "multiply")
+        if blend_mode not in get_args(BlendMode):
+            return jsonify({"error": f"Unknown blend mode: {blend_mode}"}), 400
+
         opacity = float(request.form.get("opacity", 0.3))
         midpoint = request.form.get("midpoint") or None
         center_on_face = request.form.get("center_on_face") == "true"
@@ -95,7 +106,7 @@ def create_app() -> Flask:
             image,
             midpoint=float(midpoint) if midpoint else None,
             pattern_path=Path(pattern_path) if pattern_path else None,
-            blend_mode=blend_mode,
+            blend_mode=cast(BlendMode, blend_mode),
             opacity=opacity,
             center_pattern_on_face=center_on_face,
         )

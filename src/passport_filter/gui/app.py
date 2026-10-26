@@ -27,7 +27,7 @@ class Api:
         _, encoded = data_url.split(",", 1)
         image_bytes = base64.b64decode(encoded)
 
-        result = webview.windows[0].create_file_dialog(webview.SAVE_DIALOG, save_filename=filename)
+        result = webview.windows[0].create_file_dialog(webview.FileDialog.SAVE, save_filename=filename)
         if not result:
             return None
 
